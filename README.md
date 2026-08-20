@@ -45,6 +45,14 @@ DSH Web GUI 的聊天生成式 UI 插件:让模型用真正的界面卡片代替
 - 提交按钮复用确认状态机(默认「确认提交?」二次点击;`confirm:false` 直发),成功后显示「✓ 已提交」。
 - 典型用法:工单创建、参数收集(生成配置/脚本的输入)、筛选条件提交、多选题问卷。
 
+## v0.5 · 图表增强与渲染兜底
+
+- **`chart.kind`**:`bar`(默认柱状) / `line`(折线,SVG 绘制,数据点带 title 提示) / `pie`(饼图,自带图例与百分比,未指定 color 时循环 8 色盘) / `horizontal`(横条,左侧标签右侧数值)。
+- **颜色**:`chart.color` 覆写整图主色;items 每项可带 `color`(pie/horizontal/bar 逐项,值为 CSS 颜色字符串)。
+- **`stat.trend`**:数字数组(≤24)在指标卡内渲染 sparkline 迷你趋势条,与 delta 涨跌共存。
+- **渲染错误边界**:React ErrorBoundary 兜住卡片树内异常,降级为红色提示卡而非整卡消失(v0.4 Form 事故的教训落地)。
+- precheck 新增:未知 `chart.kind` 回退提示、pie 超过 8 项的可读性建议。
+
 ## 安装
 
 ```bash
