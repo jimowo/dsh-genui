@@ -33,6 +33,18 @@ DSH Web GUI 的聊天生成式 UI 插件:让模型用真正的界面卡片代替
 
 `cardId` 由工具调用 callId 后 8 位派生,可在多卡片会话中定位事件来源;v0.4 表单提交将复用同一信封格式(payload 扩展为字段集合)。
 
+## v0.4 · 表单组件
+
+- **`form{action, submitLabel, confirm?, children}`** 包裹字段;**`input{name,label,value?,placeholder?,password?}`**、**`select{name,label,options:strings}`**、**`textarea{name,label,…}`** 为字段节点,`name` 必填且同一表单内唯一(缺失会在 warnings 中提示)。
+- 提交时全部字段值打包进 v0.3 信封的 `payload`,**一条用户消息一次回传**——比逐按钮少消耗 API 轮次:
+
+```
+[ui_card 事件] {"cardId":"a1b2c3d4","action":"create-ticket","payload":{"title":"…","severity":"P1",…}}
+```
+
+- 提交按钮复用确认状态机(默认「确认提交?」二次点击;`confirm:false` 直发),成功后显示「✓ 已提交」。
+- 典型用法:工单创建、参数收集(生成配置/脚本的输入)、筛选条件提交、多选题问卷。
+
 ## 安装
 
 ```bash

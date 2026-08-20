@@ -22,7 +22,7 @@
 - 生成 `cardId`（调用序号或短随机 id）注入按钮事件
 - 系统提示公告同步更新解析指引
 
-## v0.4 · 表单组件
+## v0.4 · 表单组件 ✅（已发布 v0.4.0）
 
 - `input{text,password,number}` / `select{options}` / `textarea` / `form{children,submitLabel,action}`
 - 提交时把全部字段打包进 v0.3 的信封 payload，一次回传一轮额度

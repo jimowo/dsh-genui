@@ -1,6 +1,6 @@
 {
   "name": "dsh-genui",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Generative UI for the dsh web GUI chat: the ui_card agent tool lets the model pass a JSON component tree (card/stat/table/chart/timeline/progress/kv/badges/alert/code/buttons/text, nestable) that the browser half renders as real React components inside the conversation instead of markdown.",
   "type": "module",
   "license": "Apache-2.0",
