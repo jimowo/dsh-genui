@@ -32,3 +32,76 @@ dsh plugin --profile web remove dsh-genui
 ```
 
 纯 JS、零构建、零第三方运行时依赖(仅 peer 依赖 react);配色用中性灰 + `--ds-color-accent` 主题变量,明暗主题自适应。
+
+## 最佳实践:一张「运营监控中心」卡片
+
+这是覆盖全部能力的参考示例,对模型说「用 ui_card 做一张运营监控中心卡片」即可复现。设计要点:
+
+1. **信息分层**:顶层 `stat-row` 放 4 个北极星指标(带 delta 涨跌)→ `alert` 全局状态灯 → `tabs` 把「流量 / 异常 / 发布」三个视图分区,避免单屏过载。
+2. **按数据形态选组件**:趋势用 `chart`,汇总用 `kv`,事件流用 `timeline`,告警用 `alert`,元信息用 `badges`,变更内容用 `code`,长尾细节收进 `collapse`。
+3. **可探索性**:异常明细表开启 `filter:true` + 点击表头排序,用户自己下钻,不消耗额度。
+4. **行动闭环**:底部 `buttons` 放 `{label, action}` 事件按钮——「下钻事故」「拉值班」「生成周报」,确认后把 action 回传对话流,agent 接续处理,形成 展示→洞察→行动 闭环。
+
+```json
+{
+  "type": "card",
+  "title": "运营监控中心",
+  "children": [
+    { "type": "stat-row", "children": [
+      { "type": "stat", "label": "活跃用户", "value": "12,847", "delta": 6.2 },
+      { "type": "stat", "label": "今日订单", "value": "3,204", "delta": 12.8 },
+      { "type": "stat", "label": "错误率", "value": "0.42%", "delta": -0.15 },
+      { "type": "stat", "label": "P99 延迟", "value": "238ms", "delta": 4.1 }
+    ]},
+    { "type": "alert", "tone": "ok", "text": "系统运行正常 · 所有核心指标在阈值内" },
+    { "type": "tabs", "items": [
+      { "label": "流量概览", "children": [
+        { "type": "chart", "items": [
+          { "label": "一", "value": 820 }, { "label": "二", "value": 936 },
+          { "label": "三", "value": 1024 }, { "label": "四", "value": 978 },
+          { "label": "五", "value": 1150 }, { "label": "六", "value": 1420 },
+          { "label": "日", "value": 1310 }
+        ]},
+        { "type": "kv", "items": [
+          { "key": "峰值时段", "value": "周六 20:00-22:00" },
+          { "key": "周环比", "value": "+11.4%" }
+        ]}
+      ]},
+      { "label": "异常明细", "children": [
+        { "type": "table", "filter": true,
+          "columns": ["时间", "服务", "级别", "详情", "耗时(ms)"],
+          "rows": [
+            ["09:42", "order-api", "ERROR", "库存扣减超时", 3200],
+            ["10:03", "payment", "ERROR", "网关连接拒绝", 5000],
+            ["10:12", "search", "WARN", "慢查询 >1s", 1450]
+          ]}
+      ]},
+      { "label": "发布记录", "children": [
+        { "type": "timeline", "items": [
+          { "title": "v2.4.0 已上线", "desc": "P99 从 262ms 降至 238ms" },
+          { "title": "v2.4.1 提测中", "desc": "修复库存超时问题" }
+        ]},
+        { "type": "collapse", "title": "变更单详情", "children": [
+          { "type": "badges", "items": ["CR-1024 已审核", "2 文件", "+86/-12"] },
+          { "type": "code", "text": "fix(inventory): 扣减增加 3s 超时与幂等键…" }
+        ]}
+      ]}
+    ]},
+    { "type": "buttons", "items": [
+      { "label": "下钻 09:42 超时事故", "action": "drilldown order-api 09:42 库存超时" },
+      { "label": "拉支付值班", "action": "page-oncall payment", "confirm": true },
+      { "label": "生成周报", "action": "generate weekly-ops-report", "confirm": false }
+    ]}
+  ]
+}
+```
+
+### 设计准则速查
+
+| 场景 | 推荐组合 |
+|---|---|
+| 周报 / 汇报 | stat-row 指标 + chart 趋势 + timeline 里程碑 + ok 告警 |
+| 排障 / 监控 | alert 状态灯 + filter 表格 + 事件按钮下钻 |
+| 文档 / 变更单 | kv 元数据 + collapse 折叠详情 + code + badges |
+| 对比 / 选型 | tabs 分方案 + table 排序筛选 + buttons 让用户拍板 |
+| 超长内容 | tabs 或 collapse 分区,永远不要一张平铺大卡 |
