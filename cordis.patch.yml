@@ -1,0 +1,13 @@
+# dsh-genui bundle patch: inserts the dual-face plugin row into the web
+# profile roster. Applied as a profile bundle layer (the `dsh.bundle.patch`
+# manifest field) over dsh-base; activate with
+# `dsh plugin --profile web add link:D:\dsh\plugin\GenUI`.
+#
+# The row is a bare plugin by package name: the node half (exports ".")
+# runs in the host process (the ui_card tool + a system-prompt
+# announcement), and the `dsh.client` declaration in package.json makes the
+# browser half (exports "./client") load in the web GUI and render the
+# tool's card inside the conversation.
+- insert:
+    - id: genui
+      name: 'dsh-genui'
